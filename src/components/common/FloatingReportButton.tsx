@@ -1,12 +1,15 @@
+
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Flag, AlertTriangle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Flag } from 'lucide-react';
 
 export const FloatingReportButton: React.FC = () => {
-  const [notificationCount, setNotificationCount] = useState(3);
+  const [notificationCount] = useState(3);
+  const navigate = useNavigate();
 
   return (
     <TooltipProvider>
@@ -20,9 +23,8 @@ export const FloatingReportButton: React.FC = () => {
           >
             <Button
               size="lg"
+              onClick={() => navigate('/report')}
               className="relative w-14 h-14 rounded-full bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
             >
               <Flag className="w-6 h-6" />
               {notificationCount > 0 && (
