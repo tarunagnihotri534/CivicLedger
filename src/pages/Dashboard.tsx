@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Layout } from "@/components/layout/Layout";
@@ -39,7 +40,7 @@ interface Scheme {
   fundReleased: number;
   beneficiaries: number;
   complaints: number;
-  status: "active" | "paused" | "under-review";
+  status: "active" | "paused" | "under-review" | "completed";
   lastUpdate: string;
 }
 
