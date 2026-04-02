@@ -28,8 +28,7 @@ echo Frontend Server: http://localhost:8080
 echo.
 echo Available Routes:
 echo - Main App: http://localhost:8080/
-echo - Mock Dashboard: http://localhost:8080/mock-dashboard
-echo - Real-Time Dashboard: http://localhost:8080/real-time-dashboard
+echo - Dashboard: http://localhost:8080/dashboard
 echo - DAO Voting: http://localhost:8080/voting
 echo.
 echo Backend Health Check: http://localhost:3001/health
@@ -40,4 +39,4 @@ echo ========================================
 echo.
 echo Press any key to open the main application...
 pause > nul
-start http://localhost:8080/real-time-dashboard 
+start http://localhost:8080/dashboard 

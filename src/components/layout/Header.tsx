@@ -65,12 +65,6 @@ export const Header = () => {
           <Link to="/dashboard" className="nav-item text-sm font-semibold text-civic-slate hover:text-civic-blue transition-all duration-300 py-2 whitespace-nowrap">
             Live Dashboard
           </Link>
-          <Link to="/mock-dashboard" className="nav-item text-sm font-semibold text-civic-slate hover:text-civic-blue transition-all duration-300 py-2 whitespace-nowrap">
-            Mock Dashboard
-          </Link>
-          <Link to="/real-time-dashboard" className="nav-item text-sm font-semibold text-civic-slate hover:text-civic-blue transition-all duration-300 py-2 whitespace-nowrap">
-            Real-Time Dashboard
-          </Link>
           <Link to="/voting" className="nav-item text-sm font-semibold text-civic-slate hover:text-civic-blue transition-all duration-300 py-2 whitespace-nowrap">
             DAO Voting
           </Link>
