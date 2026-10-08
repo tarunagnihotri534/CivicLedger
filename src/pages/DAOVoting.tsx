@@ -22,8 +22,10 @@ import {
   Coins,
   Award,
   Gavel,
-  Activity
+  Activity,
+  Sparkles
 } from "lucide-react";
+import { QuadraticVotingModal } from "@/components/governance/QuadraticVotingModal";
 
 interface Proposal {
   id: string;
@@ -49,6 +51,7 @@ export const DAOVoting = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [selectedQuadraticProposal, setSelectedQuadraticProposal] = useState<Proposal | null>(null);
 
   // Enhanced voting stats
   const votingStats = [
@@ -351,15 +354,23 @@ export const DAOVoting = () => {
                       </div>
                       
                       {!userVotes[proposal.id] && (
-                        <div className="flex space-x-2">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Button
+                            size="sm"
+                            onClick={() => setSelectedQuadraticProposal(proposal)}
+                            className="bg-purple-600 hover:bg-purple-700 text-white font-medium shadow-sm"
+                          >
+                            <Sparkles className="w-3.5 h-3.5 mr-1.5" />
+                            Quadratic Vote
+                          </Button>
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => handleVote(proposal.id, "against")}
                             className="border-red-200 text-red-600 hover:bg-red-50"
                           >
-                            <XCircle className="w-4 h-4 mr-2" />
-                            Vote Against
+                            <XCircle className="w-4 h-4 mr-1.5" />
+                            Against
                           </Button>
                           <AnimatedButton
                             size="sm"
@@ -367,8 +378,8 @@ export const DAOVoting = () => {
                             onClick={() => handleVote(proposal.id, "for")}
                             glow
                           >
-                            <CheckCircle className="w-4 h-4 mr-2" />
-                            Vote For
+                            <CheckCircle className="w-4 h-4 mr-1.5" />
+                            For
                           </AnimatedButton>
                         </div>
                       )}
@@ -420,6 +431,22 @@ export const DAOVoting = () => {
           message="Your vote has been recorded on the blockchain! Thank you for participating in decentralized governance."
           onComplete={() => setShowSuccess(false)}
         />
+
+        {selectedQuadraticProposal && (
+          <QuadraticVotingModal
+            isOpen={Boolean(selectedQuadraticProposal)}
+            onClose={() => setSelectedQuadraticProposal(null)}
+            proposalId={selectedQuadraticProposal.id}
+            proposalTitle={selectedQuadraticProposal.title}
+            onVoteCast={(votes, credits, direction) => {
+              setUserVotes(prev => ({ 
+                ...prev, 
+                [selectedQuadraticProposal.id]: direction === 'Yes' ? 'for' : 'against' 
+              }));
+              setShowSuccess(true);
+            }}
+          />
+        )}
       </div>
     </Layout>
   );

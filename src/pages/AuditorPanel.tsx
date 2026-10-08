@@ -24,8 +24,17 @@ import {
   Flag,
   MessageSquare,
   Activity,
-  TrendingUp
+  TrendingUp,
+  Database,
+  Lock,
+  CheckCircle2,
+  Sparkles,
+  RefreshCw,
+  Hash
 } from "lucide-react";
+import { civicLedgerService } from "@/lib/civicLedgerService";
+import { BlockchainAuditLedgerModal } from "@/components/dashboard/BlockchainAuditLedgerModal";
+import { AuditBlock, PolicyMilestone } from "@/lib/enhancedICPService";
 
 interface FlaggedScheme {
   id: string;
@@ -52,9 +61,54 @@ interface AuditAction {
 
 export const AuditorPanel = () => {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState<"flagged" | "actions" | "reports">("flagged");
+  const [activeTab, setActiveTab] = useState<"flagged" | "actions" | "reports" | "milestones" | "blockchain">("flagged");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
+  const [isLedgerModalOpen, setIsLedgerModalOpen] = useState(false);
+
+  const [milestonesList, setMilestonesList] = useState([
+    {
+      policyId: "POL-001",
+      policyTitle: "PM Awas Yojana - Phase 3",
+      milestoneId: "m1-02",
+      title: "Superstructure Framework & Masonry Construction",
+      contractor: "Urban Infrastructure Ltd",
+      allocatedAmount: 2000000000,
+      proofHash: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+      proofDescription: "Drone 3D survey model and concrete batch compression logs verified at 35 MPa",
+      status: "ProofSubmitted"
+    },
+    {
+      policyId: "POL-003",
+      policyTitle: "Digital Literacy Campaign",
+      milestoneId: "m3-01",
+      title: "Digital Lab Equipment Procurement",
+      contractor: "TechEd Solutions",
+      allocatedAmount: 2250000000,
+      proofHash: "0x99887766554433221100ffeeddccbbaa99887766554433221100ffeeddccbbaa",
+      proofDescription: "Hardware invoice delivery acknowledgment across 15 centers",
+      status: "ProofSubmitted"
+    }
+  ]);
+
+  const handleVerifyMilestone = async (m: typeof milestonesList[0]) => {
+    try {
+      const res = await civicLedgerService.verifyMilestone(m.policyId, m.milestoneId, "Auditor-Lead-Delhi", "Milestone inspection passed");
+      if (res.success) {
+        toast({
+          title: "Milestone Verified & Escrow Released!",
+          description: `Successfully verified "${m.title}". ₹${(m.allocatedAmount / 10000000).toFixed(1)} Cr disbursed to ${m.contractor}.`,
+        });
+        setMilestonesList(prev => prev.filter(item => item.milestoneId !== m.milestoneId));
+      }
+    } catch (err: any) {
+      toast({
+        title: "Verification Failed",
+        description: err.message,
+        variant: "destructive"
+      });
+    }
+  };
 
   // Enhanced stats for better dashboard overview
   const dashboardStats = [
@@ -222,7 +276,7 @@ export const AuditorPanel = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <div className="flex space-x-1 bg-muted p-1 rounded-lg w-fit">
+          <div className="flex flex-wrap gap-1 bg-muted p-1 rounded-lg w-fit">
             <Button
               variant={activeTab === "flagged" ? "default" : "ghost"}
               size="sm"
@@ -230,6 +284,24 @@ export const AuditorPanel = () => {
             >
               <Flag className="w-4 h-4 mr-2" />
               Flagged Schemes
+            </Button>
+            <Button
+              variant={activeTab === "milestones" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setActiveTab("milestones")}
+              className={activeTab === "milestones" ? "bg-emerald-600 hover:bg-emerald-700 text-white" : ""}
+            >
+              <CheckCircle2 className="w-4 h-4 mr-2 text-emerald-500" />
+              Milestone Escrow ({milestonesList.length})
+            </Button>
+            <Button
+              variant={activeTab === "blockchain" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setActiveTab("blockchain")}
+              className={activeTab === "blockchain" ? "bg-blue-600 hover:bg-blue-700 text-white" : ""}
+            >
+              <Database className="w-4 h-4 mr-2 text-blue-500" />
+              Blockchain Audit Trail
             </Button>
             <Button
               variant={activeTab === "actions" ? "default" : "ghost"}
@@ -459,7 +531,168 @@ export const AuditorPanel = () => {
               </GlassCard>
             </div>
           )}
+
+          {activeTab === "milestones" && (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h2 className="text-xl font-semibold">Contractor Milestone Proof Verification</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Review submitted contractor field evidence and trigger cryptographic smart-contract escrow disbursement.
+                  </p>
+                </div>
+                <Badge className="bg-emerald-100 text-emerald-800">
+                  {milestonesList.length} Pending Audit Verification
+                </Badge>
+              </div>
+
+              {milestonesList.length === 0 ? (
+                <GlassCard className="p-12 text-center">
+                  <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto mb-3" />
+                  <h3 className="text-lg font-semibold">All Milestones Cleared</h3>
+                  <p className="text-sm text-muted-foreground">
+                    All contractor proof-of-work submissions have been verified and settled on-chain.
+                  </p>
+                </GlassCard>
+              ) : (
+                <div className="grid gap-4">
+                  {milestonesList.map((m) => (
+                    <GlassCard key={m.milestoneId} className="p-6">
+                      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div className="space-y-2 flex-1">
+                          <div className="flex items-center space-x-2">
+                            <span className="text-xs font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800 font-mono">
+                              {m.policyId}
+                            </span>
+                            <h3 className="font-semibold text-lg">{m.title}</h3>
+                            <Badge className="bg-amber-100 text-amber-800">
+                              Proof Submitted
+                            </Badge>
+                          </div>
+
+                          <div className="text-sm text-muted-foreground">
+                            <span>Policy: <strong className="text-slate-800 dark:text-slate-200">{m.policyTitle}</strong></span> • 
+                            <span> Contractor: <strong className="text-slate-800 dark:text-slate-200">{m.contractor}</strong></span>
+                          </div>
+
+                          <div className="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-lg text-xs space-y-1">
+                            <div><strong>Field Proof Note:</strong> {m.proofDescription}</div>
+                            <div className="font-mono text-slate-500 truncate">
+                              <strong>Proof Hash:</strong> {m.proofHash}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col items-end space-y-3 shrink-0">
+                          <div className="text-right">
+                            <div className="text-xs text-muted-foreground uppercase font-semibold">Escrow Value</div>
+                            <div className="text-xl font-bold text-emerald-600">
+                              ₹{(m.allocatedAmount / 10000000).toFixed(1)} Cr
+                            </div>
+                          </div>
+
+                          <Button
+                            onClick={() => handleVerifyMilestone(m)}
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-md shadow-emerald-600/20"
+                          >
+                            <CheckCircle2 className="w-4 h-4 mr-1.5" />
+                            Verify & Release Escrow
+                          </Button>
+                        </div>
+                      </div>
+                    </GlassCard>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === "blockchain" && (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h2 className="text-xl font-semibold">Sovereign Blockchain Audit Ledger</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Cryptographic proof chain verified via SHA-256 Merkle trees and immutable block linking.
+                  </p>
+                </div>
+
+                <Button
+                  onClick={() => setIsLedgerModalOpen(true)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-medium"
+                >
+                  <Database className="w-4 h-4 mr-2" />
+                  Open Live Ledger Explorer
+                </Button>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-4">
+                <GlassCard className="p-5">
+                  <div className="flex items-center space-x-3 mb-2">
+                    <div className="w-9 h-9 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold">
+                      <Lock className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-500 font-semibold uppercase">Security Protocol</div>
+                      <div className="font-bold text-slate-800 dark:text-slate-200">SHA-256 Chained</div>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Every state alteration generates a Merkle-hashed block anchored to the previous block hash.
+                  </p>
+                </GlassCard>
+
+                <GlassCard className="p-5">
+                  <div className="flex items-center space-x-3 mb-2">
+                    <div className="w-9 h-9 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+                      <CheckCircle2 className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-500 font-semibold uppercase">Chain Integrity</div>
+                      <div className="font-bold text-emerald-600">100% Tamper-Evident</div>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Zero tampering detected. Cryptographic proofs mathematically guarantee ledger immutability.
+                  </p>
+                </GlassCard>
+
+                <GlassCard className="p-5">
+                  <div className="flex items-center space-x-3 mb-2">
+                    <div className="w-9 h-9 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center font-bold">
+                      <Database className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-500 font-semibold uppercase">Network Host</div>
+                      <div className="font-bold text-slate-800 dark:text-slate-200">ICP Decentralized Canister</div>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Cross-subnet consensus ensures state replication across global independent node providers.
+                  </p>
+                </GlassCard>
+              </div>
+
+              <GlassCard className="p-8 text-center border-dashed">
+                <Database className="w-12 h-12 text-blue-600 mx-auto mb-3" />
+                <h3 className="text-lg font-bold mb-1">Explore All Mined Blocks</h3>
+                <p className="text-sm text-muted-foreground max-w-md mx-auto mb-4">
+                  View raw block indices, hashes, Merkle roots, and cryptographic receipts for every policy action.
+                </p>
+                <Button onClick={() => setIsLedgerModalOpen(true)} className="bg-blue-600 hover:bg-blue-700 text-white">
+                  Launch Block Explorer
+                </Button>
+              </GlassCard>
+            </div>
+          )}
         </motion.div>
+
+        {isLedgerModalOpen && (
+          <BlockchainAuditLedgerModal
+            isOpen={isLedgerModalOpen}
+            onClose={() => setIsLedgerModalOpen(false)}
+          />
+        )}
       </div>
     </Layout>
   );

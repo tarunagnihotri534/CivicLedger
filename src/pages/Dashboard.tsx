@@ -28,8 +28,13 @@ import {
   Mic,
   MicOff,
   BarChart3,
-  Trophy
+  Trophy,
+  Database,
+  Brain,
+  Sparkles
 } from "lucide-react";
+import { BlockchainAuditLedgerModal } from "@/components/dashboard/BlockchainAuditLedgerModal";
+import { PolicyRiskAssessmentModal } from "@/components/dashboard/PolicyRiskAssessmentModal";
 
 interface Scheme {
   id: string;
@@ -50,6 +55,8 @@ export const Dashboard = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [gamificationVisible, setGamificationVisible] = useState(true);
+  const [isLedgerModalOpen, setIsLedgerModalOpen] = useState(false);
+  const [selectedRiskPolicy, setSelectedRiskPolicy] = useState<{ id: string; name: string } | null>(null);
 
   // Update time every minute for real-time feel
   useEffect(() => {
@@ -171,6 +178,16 @@ export const Dashboard = () => {
               >
                 <Trophy className="w-4 h-4" />
                 Trust Score
+              </Button>
+
+              {/* Blockchain Ledger Explorer */}
+              <Button
+                size="sm"
+                onClick={() => setIsLedgerModalOpen(true)}
+                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+              >
+                <Database className="w-4 h-4" />
+                Blockchain Ledger
               </Button>
             </div>
           </div>
@@ -464,6 +481,22 @@ export const Dashboard = () => {
             )}
           </GlassCard>
         </motion.div>
+
+        {isLedgerModalOpen && (
+          <BlockchainAuditLedgerModal
+            isOpen={isLedgerModalOpen}
+            onClose={() => setIsLedgerModalOpen(false)}
+          />
+        )}
+
+        {selectedRiskPolicy && (
+          <PolicyRiskAssessmentModal
+            isOpen={Boolean(selectedRiskPolicy)}
+            onClose={() => setSelectedRiskPolicy(null)}
+            policyId={selectedRiskPolicy.id}
+            policyTitle={selectedRiskPolicy.name}
+          />
+        )}
       </div>
     </Layout>
   );

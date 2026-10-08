@@ -53,6 +53,56 @@ export interface Policy {
   cross_chain_verification?: string[];
   zero_knowledge_proof?: string;
   quantum_resistant_signature?: string;
+  milestones?: PolicyMilestone[];
+}
+
+export interface PolicyMilestone {
+  id: string;
+  title: string;
+  description: string;
+  allocated_amount: bigint;
+  percentage: number;
+  status: 'Pending' | 'ProofSubmitted' | 'Verified' | 'Rejected';
+  proof_hash?: string | null;
+  proof_description?: string | null;
+  submitted_at?: bigint | null;
+  verified_by?: string | null;
+  verified_at?: bigint | null;
+  disbursed: boolean;
+}
+
+export interface PolicyRiskAssessment {
+  policyId: string;
+  policyTitle: string;
+  riskScore: number;
+  riskLevel: 'Low' | 'Moderate' | 'Elevated' | 'Critical';
+  factors: {
+    complaintsCount: number;
+    criticalComplaintsCount: number;
+    utilizationRatePercent: number;
+    milestonesCompletionRate: string;
+    contractorReputationScore: number;
+  };
+  recommendations: string[];
+  automatedEscrowHoldRecommended: boolean;
+}
+
+export interface AuditBlock {
+  index: number;
+  timestamp: number;
+  eventType: string;
+  payload: any;
+  previousHash: string;
+  merkleRoot: string;
+  hash: string;
+}
+
+export interface QuadraticVoteRecord {
+  voter: string;
+  direction: 'Yes' | 'No' | 'Abstain';
+  votesCount: number;
+  creditsCost: number;
+  timestamp: number;
 }
 
 export interface FundFlow {
@@ -298,6 +348,9 @@ export class EnhancedICPService {
   }
 
   private async initializeAgent() {
+    if (typeof window === 'undefined' || typeof indexedDB === 'undefined') {
+      return;
+    }
     try {
       // Initialize auth client with enhanced options
       this.authClient = await AuthClient.create({

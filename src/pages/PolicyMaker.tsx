@@ -25,8 +25,10 @@ import {
   Download,
   DollarSign,
   Activity,
-  TrendingUp
+  TrendingUp,
+  Sparkles
 } from "lucide-react";
+import { PolicyRiskAssessmentModal } from "@/components/dashboard/PolicyRiskAssessmentModal";
 
 interface Policy {
   id: string;
@@ -44,6 +46,7 @@ export const PolicyMaker = () => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<"create" | "manage" | "analytics">("create");
   const [showSuccess, setShowSuccess] = useState(false);
+  const [selectedRiskPolicy, setSelectedRiskPolicy] = useState<Policy | null>(null);
 
   // Enhanced policy stats
   const policyStats = [
@@ -426,14 +429,22 @@ fn check_eligibility(applicant: &Citizen) -> bool {
                         </div>
                       </div>
 
-                      <div className="flex space-x-2">
-                        <Button variant="outline" size="sm">
-                          <Eye className="w-4 h-4 mr-2" />
-                          View Details
+                      <div className="flex flex-wrap gap-2">
+                        <Button 
+                          size="sm"
+                          onClick={() => setSelectedRiskPolicy(policy)}
+                          className="bg-cyan-600 hover:bg-cyan-700 text-white font-medium shadow-sm"
+                        >
+                          <Sparkles className="w-3.5 h-3.5 mr-1.5" />
+                          AI Risk Audit
                         </Button>
                         <Button variant="outline" size="sm">
-                          <Settings className="w-4 h-4 mr-2" />
-                          Configure
+                          <Eye className="w-4 h-4 mr-1.5" />
+                          Details
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          <Settings className="w-4 h-4 mr-1.5" />
+                          Config
                         </Button>
                       </div>
                     </div>
@@ -498,6 +509,15 @@ fn check_eligibility(applicant: &Citizen) -> bool {
             </div>
           )}
         </motion.div>
+
+        {selectedRiskPolicy && (
+          <PolicyRiskAssessmentModal
+            isOpen={Boolean(selectedRiskPolicy)}
+            onClose={() => setSelectedRiskPolicy(null)}
+            policyId={selectedRiskPolicy.id}
+            policyTitle={selectedRiskPolicy.name}
+          />
+        )}
       </div>
     </Layout>
   );

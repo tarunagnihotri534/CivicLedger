@@ -3,24 +3,27 @@
 > **Transform government policies into executable smart contracts with real-time citizen-triggered fund flow, status visualization, and accountability.**
 
 [![ICP](https://img.shields.io/badge/ICP-Internet%20Computer-blue)](https://internetcomputer.org/)
-[![Rust](https://img.shields.io/badge/Rust-1.70+-red)](https://rust-lang.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-20+-green)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-18.3+-blue)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.5+-blue)](https://typescriptlang.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8+-(ES2022)-blue)](https://typescriptlang.org/)
+[![Vitest](https://img.shields.io/badge/Vitest-2.1+-yellow)](https://vitest.dev/)
+[![Jest](https://img.shields.io/badge/Jest-29.6+-red)](https://jestjs.io/)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 ## 🎯 Project Overview
 
 CivicLedger is a revolutionary decentralized governance platform that transforms government policies into executable smart contracts on the Internet Computer Protocol (ICP). The platform provides real-time transparency, citizen participation, and automated execution of government policies.
 
-### 🌟 Key Features
+### 🌟 Key Features & Capabilities
 
-- **🏛️ Smart Policy Contracts**: Convert text policies into executable blockchain contracts
-- **💰 Real-time Fund Tracking**: Monitor fund allocation and release with live updates
-- **👥 Citizen Complaints**: AI-powered complaint analysis and resolution system
-- **🗳️ DAO Governance**: Decentralized voting and proposal management
-- **🔍 Transparency**: Immutable audit trails and verifiable data
-- **🧠 AI Integration**: LLM-powered analysis and automation
-- **⚡ ICP Blockchain**: Built on Internet Computer for decentralized, secure governance
+- **🏛️ Smart Policy Contracts & Milestone Escrow**: Convert policies into executable blockchain contracts with granular milestone-based fund release.
+- **⚡ Automated Smart Contract Disbursement**: When auditors verify contractor Proof-of-Work, escrowed funds are automatically disbursed via cryptographically signed smart-contracts.
+- **🗳️ Anti-Whale Quadratic Voting Engine**: Protects against plutocratic whale manipulation; voting costs scale quadratically ($\text{Credits} = \text{Votes}^2$).
+- **⛓️ Cryptographic Blockchain Audit Ledger**: Every transaction, status change, and milestone disbursement is hashed into immutable SHA-256 chained blocks with Merkle roots.
+- **🧠 AI Policy Risk & Impact Assessment**: Multi-factor algorithmic scoring (complaints index, milestone velocity, escrow safety) providing automated mitigation recommendations.
+- **💰 Real-Time Fund Flow & District Tracking**: Live tracking of government allocation, contractor withdrawals, and regional absorption rates.
+- **👥 Citizen Complaints & AI Redressal**: Natural-language grievance intake with automated sentiment analysis and priority escalation.
+- **🔎 Global Instant Multi-Entity Search**: Instant cross-filtering across schemes, contractors, districts, proposals, and transaction hashes.
 
 ## 🏗️ Architecture
 
@@ -83,22 +86,33 @@ CivicLedger is a revolutionary decentralized governance platform that transforms
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) (v18+)
-- [Rust](https://rustup.rs/) (latest stable)
-- [DFX](https://internetcomputer.org/docs/current/developer-docs/setup/install/) (v0.25.0+)
+- [Node.js](https://nodejs.org/) (v20+ / v22+ / v24+ recommended)
+- [npm](https://npmjs.com/) (v10+ / v11+)
+- [TypeScript](https://typescriptlang.org/) 5.8+ (target: ES2022)
 
-### Frontend Setup
+### Running Automated Test Suites
 
 ```bash
-# Clone the repository
-git clone <repository-url>
-cd CivicLedger
+# 1. Run Frontend Vitest Suite (Unit, Service & Mathematical Logic Tests)
+npm test
 
+# 2. Run Backend Sovereign Engine Jest Suite (API, Blockchain, Quadratic Voting Tests)
+cd backend-server
+npm test
+cd ..
+```
+
+### Frontend Development & Build
+
+```bash
 # Install dependencies
 npm install
 
 # Start development server
 npm run dev
+
+# Compile production bundle
+npm run build
 ```
 
 ### Backend Setup

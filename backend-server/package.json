@@ -3,10 +3,14 @@
   "version": "1.0.0",
   "description": "Real-time backend server for CivicLedger ICP dApp",
   "main": "server.js",
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "test": "jest"
+    "test": "jest --runInBand --forceExit"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -24,7 +28,8 @@
   },
   "devDependencies": {
     "jest": "^29.6.2",
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "supertest": "^7.3.1"
   },
   "keywords": [
     "icp",
